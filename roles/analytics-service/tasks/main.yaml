@@ -1,0 +1,44 @@
+- name: install python
+  ansible.builtin.dnf:
+   name:
+     - python3.12
+     - python3.12-pip
+     - python3.12-devel
+     - gcc
+   state: present
+
+- name: adding the appuser
+  ansible.builtin.user:
+   name: appuser
+   shell: /bin/false
+
+- name: creating the directory
+  ansible.builtin.file:
+   name: /app
+   state: directory
+   owner: appuser
+   group: appuser
+   mode: 770
+
+- name: download and extract the package
+  ansible.builtin.unarchive:
+   src: https://raw.githubusercontent.com/raghudevopsb88/wealth-project/main/artifacts/analytics-service.tar.gz
+   dest: /app
+   remote_src: true
+
+- name: Install the python packages
+  ansible.builtin.shell: pip3.12 install --no-cache-dir .
+  args:
+   chdir: /app
+
+- name: copy the configuration file
+  ansible.builtin.copy:
+   src: analytics-service.service
+   dest: /etc/systemd/system/
+
+- name: configuring the service and starting the service
+  ansible.builtin.systemd_service:
+   name: analytics-service
+   daemon-reload: true
+   enabled: true
+   state: restarted   

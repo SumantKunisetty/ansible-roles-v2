@@ -1,6 +1,6 @@
 - name: copy the service file
   ansible.builtin.copy:
-   src: "{{ COMPONENT }}".service
+   src: "{{ COMPONENT }}.service"
    dest: /etc/systemd/system/
 
 - name: restarting the auth-service
